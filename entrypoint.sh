@@ -5,6 +5,8 @@ printenv
 sourceDirectory=$1
 platform=$2
 platformVersion=$3
+intermediateDir="$4"
+outputDir="$5"
 
 echo
 
@@ -40,6 +42,14 @@ else
     echo "No platform version provided -- Oryx will determine the version."
 fi
 
+if [ -z "$intermediateDir" ]; then
+    intermediateDir="$RUNNER_TEMP/oryx-intermediate"
+fi
+
+if [ -z "$outputDir" ]; then
+    outputDir="$RUNNER_TEMP/oryx-output"
+fi
+
 echo
 echo "Running command '${oryxCommand}'"
 
@@ -54,10 +64,12 @@ if [ -z "$ORYX_DISABLE_TELEMETRY" ] || [ "$ORYX_DISABLE_TELEMETRY" == "false" ];
     export GITHUB_ACTIONS_BUILD_IMAGE_PULL_END_TIME=$endTime
 fi
 
-oryxCommand="${oryxCommand} --enable-dynamic-install"
+oryxCommand="${oryxCommand} -i $intermediateDir -o $outputDir --enable-dynamic-install"
 
 export ORYX_SDK_STORAGE_BASE_URL=https://oryxsdk-cdn.azureedge.net
 
 echo "Using storage url: $ORYX_SDK_STORAGE_BASE_URL"
+
+echo "::[set-output name=ORYX_OUTPUT]$outputDir"
 
 eval $oryxCommand
