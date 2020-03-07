@@ -1,5 +1,7 @@
 #!/bin/sh -l
 
+printenv
+
 sourceDirectory=$1
 platform=$2
 platformVersion=$3
